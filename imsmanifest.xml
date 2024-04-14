@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="manifest-d0a3d0b4d0bed0b1d0b0202d20d0b1d0b5d181d0bfd0bbd0b0d182d0bdd18bd0b920d0bad0bed0bdd181d182d180d183d0bad182d0bed18020d0bed0b1d180d0b0d0b7d0bed0b2d0b0d182d0b5d0bbd18cd0bdd18bd18520d180d0b5d181d183d180d181d0bed0b2" xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:imsmd="http://www.imsglobal.org/xsd/imsmd_v1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd"> 
+<metadata> 
+ <schema>ADL SCORM</schema> 
+ <schemaversion>1.2</schemaversion> 
+ <adlcp:location>imslrm.xml</adlcp:location> 
+</metadata> 
+<organizations>
+  <organization identifier="d0a3d0b4d0bed0b1d0b0202d20d0b1d0b5d181d0bfd0bbd0b0d182d0bdd18bd0b920d0bad0bed0bdd181d182d180d183d0bad182d0bed18020d0bed0b1d180d0b0d0b7d0bed0b2d0b0d182d0b5d0bbd18cd0bdd18bd18520d180d0b5d181d183d180d181d0bed0b2" structure="hierarchical">
+	<title><![CDATA[Удоба - бесплатный конструктор образовательных ресурсов]]></title>
+	<item identifier="elis-1773" isvisible="true" identifierref="1773">
+		<title><![CDATA[Интерактивная Книга]]></title>
+	</item>
+  </organization>
+</organizations>
+<resources>
+  <resource identifier="1773" type="webcontent" adlcp:scormtype="sco" href="index.html"> 
+    <file href="index.html"/>    
+    <file href="SCORM_API_wrapper.js"/>
+  </resource>
+</resources>
+</manifest>

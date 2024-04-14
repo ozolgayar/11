@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+<head>
+    <title>Интерактивная Книга</title>
+    <meta http-equiv="Content-Type" content="text/html;  charset=utf-8" />
+    <style type="text/css">
+        html, 
+        body {
+            width:100%;
+            height:100%;
+            margin: 0;
+            padding: 0;
+            overflow:hidden;
+        }	
+        iframe {
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            overflow: hidden; 
+            background: white;
+        }
+    </style>
+
+
+    <script type="text/javascript" src="SCORM_API_wrapper.js"></script>
+
+    <script type="text/javascript">
+
+        //creating shortcut for less verbose code
+        var scorm = pipwerks.SCORM;
+
+        function init(){
+        //	scorm.version = "1.2"; // auto if not specified
+            scorm.init();
+        }
+
+        function set(param, value){
+            scorm.set(param, value);
+        }
+
+        function get(param){
+            scorm.get(param);
+        }
+
+        function end(){
+            scorm.quit();
+        }
+
+        window.onload = function (){
+            init();
+        }
+
+        window.onunload = function (){
+            end();
+        }
+    </script>
+    
+    
+    <script type="text/javascript">
+
+    window.addEventListener("resize",function(){
+      var iframe = document.getElementById("elis-document");
+      if (iframe != undefined) {
+	iframe.width = window.innerWidth;
+	iframe.height = window.innerHeight;		
+      }	
+    });
+
+    window.addEventListener("message",function(event){
+        try {
+            console.log('recive scorm message', event);
+            var data = event.data;
+            if (typeof event.data === 'string') {
+                var data = JSON.parse(event.data);
+            } 
+            console.log('scorm message data', data);
+            if (data != null && typeof data === 'object') {
+                if (data.src != null && data.height != null) {
+                    // set height
+                }
+                if (data.type != null && data.type == 'xAPI' && data.statement != null) {
+                    var eventData = data.statement; // xapi event
+                    console.log('get remote event',eventData);
+
+                    var isCompleted = (eventData.verb != null && eventData.verb.display != null && eventData.verb.display['en-US'] != null && eventData.verb.display['en-US'] === 'answered' || eventData.verb.display['en-US'] === 'completed') ? true : false;
+                    var isChild = (eventData.context != null && eventData.context.contextActivities != null && eventData.context.contextActivities.parent != null) ? true : false;
+                    if (isCompleted && !isChild) { // is parent and is completed
+                        if (eventData.result != null && eventData.result.score != null && eventData.result.score.scaled != 0 && eventData.result.score.scaled > 0) {
+                        console.info('result event',eventData);
+                        //ElisPlayLog.dataCount = Math.round(100 * eventData.result.score.scaled); // in dataCount have 100 * scaled (normalized) results. 0 <= dataCount <= 100
+                        
+                            switch (scorm.version) {
+                                case '1.2':
+                                    // for 1.2 save only scaled raw
+                                    
+                                    if (eventData.result.score.scaled != null) {
+                                        scorm.set("cmi.core.score.raw", (Math.round(eventData.result.score.scaled * 100)) + ""); // for SCORM 1.2 raw must be scaled 0-100 https://support.scorm.com/hc/en-us/articles/206166466-cmi-score-raw-whole-numbers-
+                                        //scorm.set("cmi.core.score.min", "0");
+                                        //scorm.set("cmi.core.score.max", "100");
+                                    }    
+                                    break;
+                                default:
+                                    if (eventData.result.score.raw != null) scorm.set("cmi.core.score.raw", eventData.result.score.raw + "");
+                                    if (eventData.result.score.min != null) scorm.set("cmi.core.score.min", eventData.result.score.min + "");
+                                    if (eventData.result.score.max != null) scorm.set("cmi.core.score.max", eventData.result.score.max + "");
+                                    if (eventData.result.score.scaled != null) scorm.set("cmi.core.score.scaled", eventData.result.score.scaled + "");
+                            }
+                        }
+                      
+                        if (eventData.result != null && eventData.result.completion != null) {
+                          //if (eventData.result.completion === true) scorm.set( "cmi.core.lesson_status", "completed");
+                          //if (eventData.result.completion === false) scorm.set( "cmi.core.lesson_status", "incomplete");
+
+                          if (eventData.result.completion === true) {
+                              scorm.status("set", "completed");
+                              if (eventData.result.success === true) {
+                                  scorm.set("cmi.success_status", "passed");
+                              }
+                          } else if (eventData.result.completion === false) {
+                              scorm.status("set", "incomplete");
+                              if (eventData.result.success === false) {
+                                  scorm.set("cmi.success_status", "failed");
+                              }
+                          }
+                        }
+                        scorm.save();
+                    }
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
+  </script>
+
+</head>
+
+<body>
+    
+  <iframe id="elis-document" src="https://udoba.org/node/1773/embed" allowfullscreen></iframe>
+  
+</body>
+</html>
